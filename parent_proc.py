@@ -12,16 +12,12 @@ import transm_global_params
 
 
 def get_topology(points_number):
-    coordinates_list = []
-    for i in range(points_number):
-        coordinates_list.append([i - points_number // 2, 0.5 * (i - points_number // 2) ** 2])
-
     edges = []
 
     for i in range(0, points_number - 1):
         edges.append((i, i + 1))
 
-    return coordinates_list, edges
+    return edges
 
 
 def run_light_src(coord, transmission_protocol, senders):
@@ -75,7 +71,10 @@ if __name__ == '__main__':
     focus_coord = transm_global_params.FOCUS_COORDINATE
     light_src_coord = transm_global_params.LIGHT_SOURCE_COORDINATE
 
-    mirrors_coordinates, edges = get_topology(transm_global_params.NODES_NUMBER)
+    nodes_number = len(transm_global_params.MIRRORS_COORDINATES)
+    mirrors_coordinates = transm_global_params.MIRRORS_COORDINATES
+
+    edges = get_topology(nodes_number)
 
     print(mirrors_coordinates)
 
@@ -92,7 +91,7 @@ if __name__ == '__main__':
     senders_ipc_managers_l2m = []
     receivers_ipc_managers_l2m = []
 
-    for i in range(transm_global_params.NODES_NUMBER):
+    for i in range(nodes_number):
         senders_ipc_managers_m2m.append({})
         receivers_ipc_managers_m2m.append({})
 
@@ -119,7 +118,7 @@ if __name__ == '__main__':
         senders_ipc_managers_m2m[j][i] = ipc_manager2
         receivers_ipc_managers_m2m[j][i] = ipc_manager1
 
-    for i in range(transm_global_params.NODES_NUMBER):
+    for i in range(nodes_number):
         ipc_manager1 = IPCManagerPipes()
         ipc_manager2 = IPCManagerPipes()
 
@@ -158,7 +157,7 @@ if __name__ == '__main__':
         )
     ]
 
-    for i in range(transm_global_params.NODES_NUMBER):
+    for i in range(nodes_number):
         processes.append(Process(target=run_mirror, args=(
             mirrors_coordinates[i],
             transmission_protocol,
@@ -181,10 +180,3 @@ if __name__ == '__main__':
 
     for p in processes:
         p.join()
-
-
-
-
-
-
-
